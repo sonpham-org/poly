@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model OrderbookSnapshot {
+  id         Int      @id @default(autoincrement())
+  tokenId    String
+  marketSlug String
+  timestamp  DateTime
+  bids       Json     // [{price, size}]
+  asks       Json     // [{price, size}]
+  spread     Float
+  midpoint   Float
+  createdAt  DateTime @default(now())
+
+  @@index([tokenId, timestamp])
+  @@index([marketSlug, timestamp])
+}
+
+model CachedTrade {
+  id              Int      @id @default(autoincrement())
+  conditionId     String
+  marketSlug      String
+  side            String   // BUY or SELL
+  outcome         String   // Yes or No
+  price           Float
+  size            Float
+  usdcAmount      Float
+  timestamp       DateTime
+  maker           String?
+  taker           String?
+  transactionHash String?
+  isMint          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@index([conditionId, timestamp])
+  @@index([marketSlug, timestamp])
+  @@unique([transactionHash, conditionId])
+}
+
+model TrackedMarket {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  question    String
+  conditionId String
+  tokenIdYes  String
+  tokenIdNo   String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
