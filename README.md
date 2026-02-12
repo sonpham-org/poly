@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Polymarket Replay Explorer
 
-## Getting Started
+Replay and understand how prediction markets work. Travel back in time to see how markets evolved, how trades moved prices, and how the orderbook mechanism works.
 
-First, run the development server:
+**Live at [poly.sonpham.net](https://poly.sonpham.net)**
+
+## Features
+
+- **Market Browser** — Search and filter active prediction markets by category
+- **Live Market View** — Real-time orderbook with depth bars, recent trades feed
+- **Market Replay** — Step through historical trades with price chart, play/pause controls, and plain-language explanations of each trade
+- **Learn** — Educational page explaining conditional tokens, orderbooks, share creation, and settlement
+
+## Tech Stack
+
+- **Next.js 16** (TypeScript, Tailwind, App Router)
+- **PostgreSQL** + **Prisma** for orderbook snapshots and trade caching
+- **lightweight-charts** for price timeline visualization
+- **Railway** for deployment
+
+## Data Sources
+
+All Polymarket APIs are free and require no authentication:
+
+| API | Purpose |
+|-----|---------|
+| Gamma API | Market metadata, search, categories |
+| CLOB API | Live orderbook, historical prices |
+| Data API | Trade history |
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The app works without a database — API routes fall back to fetching directly from Polymarket. To enable trade caching and orderbook snapshots:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+# Set DATABASE_URL to a PostgreSQL connection string
+npx prisma db push
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deploy to Railway
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push to GitHub
+2. Create a Railway project from the repo
+3. Add a PostgreSQL plugin
+4. Set `DATABASE_URL` environment variable
+5. Deploy — Railway auto-detects Next.js via Nixpacks
+6. Add CNAME `poly` to your domain DNS pointing to the Railway domain
